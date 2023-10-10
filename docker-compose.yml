@@ -1,0 +1,103 @@
+version: '3.9'
+services:
+  node1:
+    build:
+      context: ./node_1
+    networks: 
+      - db_network
+    ports:
+      - "8081:8081"
+    restart: always
+    depends_on:
+      - bootstrap-node
+      - kafka
+
+  node2:
+    build:
+      context: ./node_2
+    networks: 
+      - db_network
+    ports:
+      - "8082:8082"
+    restart: always
+    depends_on:
+      - bootstrap-node
+      - kafka
+
+  node3:
+    build:
+      context: ./node_3
+    networks: 
+      - db_network
+    ports:
+      - "8083:8083"
+    restart: always
+    depends_on:
+      - bootstrap-node
+      - kafka
+
+  node4:
+    build:
+      context: ./node_4
+    networks: 
+      - db_network
+    ports:
+      - "8084:8084"
+    restart: always
+    depends_on:
+      - bootstrap-node
+      - kafka
+
+  node5:
+    build:
+      context: ./node_5
+    networks: 
+      - db_network
+    ports:
+      - "8085:8085"
+    restart: always
+    depends_on:
+      - bootstrap-node
+      - kafka
+  
+  bootstrap-node:
+    build:
+      context: ./BootstrapNode
+    networks: 
+      - db_network
+    ports:
+      - "8080:8080"
+    restart: always
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    networks: 
+      - db_network
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+  
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    networks: 
+      - db_network
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+networks:
+  db_network:
+    name: decentralizedDatabase
+
